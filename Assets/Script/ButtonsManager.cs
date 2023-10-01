@@ -13,9 +13,15 @@ public class ButtonsManager : MonoBehaviour
     private bool isFaded = false;
     public float Fade_Duration;
     public Vector3 ScaleSize, ScaleSmallSize;
-    public float Pulse_Duration, Scale_Duration;
+    public float Pulse_Strength, Pulse_Duration, Scale_Duration;
+    private bool isMoved = false;
+    public Vector3 InitialPosition, TargetPosition;
+    public float MoveDuration;
 
-
+    public void Start()
+    {
+        DOTween.Init();
+    }
     public void Zoom()
     {
         float targetScale = isZoomOut ? Zoom_Value : 0f;
@@ -39,27 +45,30 @@ public class ButtonsManager : MonoBehaviour
     }
     public void Fade()
     {
-        if (!isFaded)
-        {
-            // Fade the image in
-            image.DOFade(1f, Fade_Duration)
-                .OnComplete(() => isFaded = true);
-        }
-        else
-        {
-            // Fade the image out
-            image.DOFade(0, Fade_Duration)
-                .OnComplete(() => isFaded = false);
-        }
+        float targetAlpha = isFaded ? 1f : 0f;
+        image.DOFade(targetAlpha, Fade_Duration);
+        isFaded = !isFaded;
     }
     public void Pulse()
     {
-        image.transform.DOScale(ScaleSize, Scale_Duration).SetEase(Ease.InSine);
-        image.DOFade(0.5f, Pulse_Duration).OnComplete(()=> Pulseback());
+        image.transform.DOScale(ScaleSize, Scale_Duration).SetEase(Ease.InOutBounce);
+        image.DOFade(Pulse_Strength, Pulse_Duration).OnComplete(()=> Pulseback());
     }
     public void Pulseback()
     {
-        image.transform.DOScale(ScaleSmallSize, Scale_Duration).SetEase(Ease.InSine);
+        image.transform.DOScale(ScaleSmallSize, Scale_Duration).SetEase(Ease.InOutBounce);
         image.DOFade(1f, Pulse_Duration);
+    }
+    public void Move()
+    {
+        Vector3 targetPosition = isMoved ? InitialPosition : TargetPosition;
+        image.transform.DOLocalMove(targetPosition, MoveDuration).SetEase(Ease.Linear);
+        isMoved = !isMoved;
+    }
+    public void Party()
+    {
+        Flip();
+        Pulse();
+        Shake();
     }
 }
