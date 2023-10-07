@@ -14,7 +14,6 @@ public class ButtonsManager : MonoBehaviour
     public float Fade_Duration;
     public Vector3 ScaleSize, ScaleSmallSize;
     public float Pulse_Strength, Pulse_Duration, Scale_Duration;
-    private bool isMoved = false;
     public Vector3 InitialPosition, TargetPosition;
     public float MoveDuration;
 
@@ -59,11 +58,16 @@ public class ButtonsManager : MonoBehaviour
         image.transform.DOScale(ScaleSmallSize, Scale_Duration).SetEase(Ease.InOutBounce);
         image.DOFade(1f, Pulse_Duration);
     }
-    public void Move()
+    public void Swing()
     {
-        Vector3 targetPosition = isMoved ? InitialPosition : TargetPosition;
-        image.transform.DOLocalMove(targetPosition, MoveDuration).SetEase(Ease.Linear);
-        isMoved = !isMoved;
+        Sequence SwingSequence = DOTween.Sequence();
+
+        SwingSequence.Append(image.rectTransform.DORotate(new Vector3(0f, 0f, 15f), 0.5f).SetEase(Ease.InOutQuad));
+        SwingSequence.AppendInterval(0.1f);
+        SwingSequence.Append(image.rectTransform.DORotate(new Vector3(0f, 0f, -15f), 0.5f).SetEase(Ease.InOutQuad));
+        SwingSequence.AppendInterval(0.1f);
+        SwingSequence.Append(image.rectTransform.DORotate(new Vector3(0f, 0f, 0), 0.5f).SetEase(Ease.InOutQuad));
+
     }
     public void Party()
     {
